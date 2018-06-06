@@ -97,9 +97,9 @@ Searching for tilings...
  - - - - - - o o
 ```
 
-Currently available polyominoes are:
+The currently available polyominoes are:
 
-* I:
+* I
 
 ```
  o
@@ -108,7 +108,7 @@ Currently available polyominoes are:
  o
 ```
 
-* J:
+* J
 
 ```
    o
@@ -116,7 +116,7 @@ Currently available polyominoes are:
  o o
 ```
 
-* L:
+* L
 
 ```
  o
@@ -124,28 +124,28 @@ Currently available polyominoes are:
  o o
 ```
 
-* O:
+* O
 
 ```
  o o
  o o
 ```
 
-* S:
+* S
 
 ```
    o o
  o o
 ```
 
-* T:
+* T
 
 ```
  o o o
    o
 ```
 
-* Z:
+* Z
 
 ```
  o o
