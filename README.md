@@ -94,7 +94,7 @@ Currently available polyominoes are:
    o
 ```
 
-*Z:
+* Z:
 
 ```
  o o
