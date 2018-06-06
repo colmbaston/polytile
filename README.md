@@ -10,23 +10,13 @@ The program should be called with the first two command-line arguments represent
 > ./polytile 7 4 I I L S T T Z
 Searching for tilings...
 
+ o o o - - - -
+ o - - - - - -
  - - - - - - -
  - - - - - - -
- - - - - o - -
- - - - o o o -
 
+ - - - o o o o
  - - - - - - -
- - - - - - - -
- - - o o - - -
- - o o - - - -
-
- - - - - - - -
- - - - - - - o
- - - - - - o o
- - - - - - - o
-
- - - - - - - -
- - - o o o o -
  - - - - - - -
  - - - - - - -
 
@@ -35,15 +25,25 @@ Searching for tilings...
  o o - - - - -
  o - - - - - -
 
- - - - o o o o
  - - - - - - -
+ - - o o o o -
  - - - - - - -
  - - - - - - -
 
- o o o - - - -
- o - - - - - -
+ - - - - - - -
+ - - - - - - o
+ - - - - - o o
+ - - - - - - o
+
  - - - - - - -
  - - - - - - -
+ - - o o - - -
+ - o o - - - -
+
+ - - - - - - -
+ - - - - - - -
+ - - - - o - -
+ - - - o o o -
 ```
 
 Currently available polyominoes are:
