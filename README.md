@@ -7,43 +7,92 @@ A program for tiling one-sided polyominoes on a rectangular grid, written in Has
 The program should be called with the first two command-line arguments representing the size of the grid, width and height respectively, and the rest being a list of polyominoes to tile.
 
 ```
-> ./polytile 7 4 I I L S T T Z
+> ./polytile 8 6 I J J J J L O O T T Z Z
 Searching for tilings...
 
- o o o - - - -
- o - - - - - -
- - - - - - - -
- - - - - - - -
+ o o o o - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
 
- - - - o o o o
- - - - - - - -
- - - - - - - -
- - - - - - - -
+ - - - - - - - -
+ o - - - - - - -
+ o - - - - - - -
+ o o - - - - - -
+ - - - - - - - -
+ - - - - - - - -
 
- - - - - - - -
- - o - - - - -
- o o - - - - -
- o - - - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
+ o o - - - - - -
+ o o - - - - - -
 
- - - - - - - -
- - - o o o o -
- - - - - - - -
- - - - - - - -
+ - - - - - - - -
+ - o o - - - - -
+ - o o - - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
 
- - - - - - - -
- - - - - - - o
- - - - - - o o
- - - - - - - o
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - o o - - - -
+ - - o - - - - -
+ - - o - - - - -
 
- - - - - - - -
- - - - - - - -
- - - o o - - -
- - o o - - - -
+ - - - - o - - -
+ - - - o o - - -
+ - - - o - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
 
- - - - - - - -
- - - - - - - -
- - - - - o - -
- - - - o o o -
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - - o - - - -
+ - - - o o o - -
+
+ - - - - - - - -
+ - - - - - o - -
+ - - - - o o - -
+ - - - - o - - -
+ - - - - - - - -
+ - - - - - - - -
+
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - o - -
+ - - - - o o o -
+ - - - - - - - -
+
+ - - - - - o o o
+ - - - - - - - o
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
+
+ - - - - - - - -
+ - - - - - - o -
+ - - - - - - o o
+ - - - - - - o -
+ - - - - - - - -
+ - - - - - - - -
+
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - -
+ - - - - - - - o
+ - - - - - - - o
+ - - - - - - o o
 ```
 
 Currently available polyominoes are:
