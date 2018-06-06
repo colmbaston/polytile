@@ -76,7 +76,7 @@ main :: IO ()
 main = do (w, h, ps) <- getArgs >>= parseArgs
           if w * h < sum (map S.size ps)
             then putStrLn "Cannot tile: too many polyominoes!"
-            else do putStrLn "Searching for tiling..."
+            else do putStrLn "Searching for tilings..."
                     case tile w h ps of
                       []    ->    putStrLn "No tilings found!"
                       (t:_) -> do putStrLn ""
