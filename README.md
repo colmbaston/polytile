@@ -1,7 +1,7 @@
 # polytile
 
-A Haskell program for tiling one-sided polyominoes on a rectangular grid.
-The program is capable of handing any polyomino, but currently only accepts the seven one-sided tetrominos (polyominos of size four) from the command-line.
+A Haskell program for tiling one-sided [polyominoes](https://en.wikipedia.org/wiki/Polyomino) on a rectangular grid.
+The program is capable of handling any polyomino, simply representing them as sets of coordinates internally, but currently only accepts the seven one-sided tetrominos (polyominos of size four) from the command-line.
 I originally wrote this program because I was too lazy to actually solve the tetromino tiling puzzles in [the Talos Principle](http://www.croteam.com/talosprinciple/), but not lazy enough to just follow a guide.
 
 ## Usage
