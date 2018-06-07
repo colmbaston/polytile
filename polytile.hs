@@ -28,7 +28,7 @@ polyominoes = M.fromAscList [("I", S.fromList [(0, 0),(0, 1),(0,2),(0,3)]),
                              ("Z", S.fromList [(0, 0),(1, 0),(1,1),(2,1)])]
 
 grid :: Int -> Int -> Grid
-grid w h = S.fromList [(x,y) | x <- [0..w-1], y <- [0..h-1]]
+grid w h = S.fromAscList [(x,y) | x <- [0..w-1], y <- [0..h-1]]
 
 rotations :: Poly -> [Poly]
 rotations = map head . group . sort . map normalise . take 4 . iterate (S.map (swap . fmap negate))
