@@ -15,6 +15,8 @@ I've included a Bash script, `talos.sh`, that will run `polytile` on all 35 sigi
 
 For best results, if your terminal will allow it, set the `-c` option to output ANSI colour codes, allowing the output to be condensed into a single drawing, and set the `-u` option to output Unicode characters.
 
+![Colour Example](./colour.png)
+
 ```
 > ./polytile -u 6 6 L L L L O S S S S
 Searching for tilings...
