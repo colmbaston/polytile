@@ -136,7 +136,6 @@ drawTilingColour (a,b) w h t = putStr (unlines [((' ':) . unwords) [colourChar (
 
 {-
     Find a colouring such that no two adjacent polyominoes share the same colour.
-    The result should contain up to four groups of polyominos, one group per colour.
 -}
 
 colouring :: [Poly] -> [[Poly]]
