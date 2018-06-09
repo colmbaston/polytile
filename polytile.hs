@@ -131,7 +131,8 @@ drawTilingColour (a,b) w h t = putStr (unlines [((' ':) . unwords) [colourChar (
     colourChar (Just 2) = "\ESC[1;32m" ++ a : "\ESC[0m"
     colourChar (Just 3) = "\ESC[1;36m" ++ a : "\ESC[0m"
     colourChar (Just 4) = "\ESC[1;33m" ++ a : "\ESC[0m"
-    colourChar _        = error "impossible due to four-colour theorem"
+    colourChar (Just 5) = "\ESC[1;35m" ++ a : "\ESC[0m"
+    colourChar _        = error "exhausted colours!"
 
 {-
     Find a colouring such that no two adjacent polyominoes share the same colour.
