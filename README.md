@@ -10,81 +10,16 @@ I've included a Bash script, `talos.sh`, that will run `polytile` on all 35 sigi
 ## Usage
 
 ```
-./polytile [-c] [-u] <width> <height> <polyominoes...>
+./polytile [-a MILLISECONDS] [-c] [-u] <width> <height> <polyominoes...>
 ```
 
 For best results, if your terminal will allow it, set the `-c` option to output ANSI colour codes, allowing the output to be condensed into a single drawing, and set the `-u` option to output Unicode characters.
 
-![Colour Example](./colour.png)
+![Colour](./colour.png)
 
-```
-> ./polytile -u 6 6 L L L L O S S S S
-Searching for tilings...
+The output can also be animated with the `-a` option, specifying the number of milliseconds to delay between updating the drawing. Setting `-a` implies `-c`.
 
- ■ ■ ■ □ □ □
- ■ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
-
- □ □ □ □ □ □
- □ ■ ■ □ □ □
- ■ ■ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
-
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
- ■ □ □ □ □ □
- ■ □ □ □ □ □
- ■ ■ □ □ □ □
-
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ ■ □ □ □ □
- □ ■ ■ □ □ □
- □ □ ■ □ □ □
-
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ ■ ■ □ □
- □ □ ■ ■ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
-
- □ □ □ ■ □ □
- □ □ □ ■ ■ □
- □ □ □ □ ■ □
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
-
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ ■ ■
- □ □ □ ■ ■ □
- □ □ □ □ □ □
-
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ ■
- □ □ □ ■ ■ ■
-
- □ □ □ □ ■ ■
- □ □ □ □ □ ■
- □ □ □ □ □ ■
- □ □ □ □ □ □
- □ □ □ □ □ □
- □ □ □ □ □ □
-
-```
+![Animation](./animation.gif)
 
 ## Polyominoes
 

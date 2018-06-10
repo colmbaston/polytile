@@ -1,5 +1,7 @@
 import           Data.Char
 import           Data.List
+import           Data.Tree
+import           Data.Maybe
 import           Data.Tuple
 import qualified Data.Set as S
 import           Data.Set (Set)
@@ -9,6 +11,8 @@ import           Data.Bifunctor
 import           Data.Function
 import           System.Environment
 import           System.Exit
+import           Control.Monad
+import           Control.Concurrent
 
 {-
     Polyominos, grids, and coordinate-based utility functions.
@@ -18,13 +22,13 @@ type Poly = Set (Int, Int)
 type Grid = Set (Int, Int)
 
 polyominoes :: Map String Poly
-polyominoes = M.fromList [("I", S.fromList [(0, 0),(0, 1),(0,2),(0,3)]),
-                          ("J", S.fromList [(1,-2),(1,-1),(0,0),(1,0)]),
-                          ("L", S.fromList [(0, 0),(0, 1),(0,2),(1,2)]),
-                          ("O", S.fromList [(0, 0),(1, 0),(0,1),(1,1)]),
-                          ("S", S.fromList [(1,-1),(2,-1),(0,0),(1,0)]),
-                          ("T", S.fromList [(0, 0),(1, 0),(2,0),(1,1)]),
-                          ("Z", S.fromList [(0, 0),(1, 0),(1,1),(2,1)])]
+polyominoes = M.fromAscList [("I", S.fromList [(0, 0),(0, 1),(0,2),(0,3)]),
+                             ("J", S.fromList [(1,-2),(1,-1),(0,0),(1,0)]),
+                             ("L", S.fromList [(0, 0),(0, 1),(0,2),(1,2)]),
+                             ("O", S.fromList [(0, 0),(1, 0),(0,1),(1,1)]),
+                             ("S", S.fromList [(1,-1),(2,-1),(0,0),(1,0)]),
+                             ("T", S.fromList [(0, 0),(1, 0),(2,0),(1,1)]),
+                             ("Z", S.fromList [(0, 0),(1, 0),(1,1),(2,1)])]
 
 offset :: (Int, Int) -> Poly -> Poly
 offset (x,y) = S.mapMonotonic (bimap (+x) (+y))
@@ -51,67 +55,88 @@ place p g | S.size g - S.size p == S.size g' = Just g'
     Core algorithm to find grid tilings.
 -}
 
-uniquePerms :: Ord a => [a] -> [[a]]
-uniquePerms = go . group . sort
-  where
-    go :: [[a]] -> [[a]]
-    go []  = [[]]
-    go xss = do (y:ys,yss) <- selects xss
-                (y:) <$> go (if null ys then yss else ys:yss)
-
-    selects :: [a] -> [(a,[a])]
-    selects []     = []
-    selects (x:xs) = (x,xs) : map (fmap (x:)) (selects xs)
-
-tilings :: Int -> Int -> [Poly] -> [[Poly]]
-tilings w h = concatMap (go grid) . uniquePerms
+uniquePermTree :: Int -> Int -> [Poly] -> Tree [Poly]
+uniquePermTree w h = go grid [] . group . sort
   where
     grid :: Grid
     grid = S.fromAscList [(x,y) | x <- [0..w-1], y <- [0..h-1]]
 
-    go :: Grid -> [Poly] -> [[Poly]]
-    go _ []     = [[]]
-    go g (p:ps) = do r <- offset (minimum g) <$> rotations p
-                     case place r g of
-                       Nothing -> []
-                       Just g' -> (r:) <$> go g' ps
+    go :: Grid -> [Poly] -> [[Poly]] -> Tree [Poly]
+    go g xs pss = Node xs (do (y:ys,yss) <- selects pss
+                              r <- offset (minimum g) <$> rotations y
+                              case place r g of
+                                Nothing -> []
+                                Just g' -> [go g' (xs ++ [r]) (if null ys then yss else ys:yss)])
+
+selects :: [a] -> [(a,[a])]
+selects []     = []
+selects (x:xs) = (x,xs) : map (fmap (x:)) (selects xs)
+
+tiling :: Int -> Int -> [Poly] -> Maybe [Poly]
+tiling w h = go . uniquePermTree w h
+  where
+    go :: Tree [Poly] -> Maybe [Poly]
+    go (Node ps []) | sum (map S.size ps) == w * h = Just ps
+                    | otherwise                    = Nothing
+    go (Node _  ts) = msum (map go ts)
 
 {-
     Command-line parsing, data structure setup and core IO.
 -}
 
 main :: IO ()
-main = do (c, u, w, h, ps) <- getArgs >>= parseArgs
+main = do (c, u, t, w, h, ps) <- getArgs >>= parseArgs
+          let draw x = putStrLn "" >> (if c then drawTilingColour else drawTiling)
+                                        (if u then ('\x25a0','\x25a1') else ('o','-'))
+                                          w h x >> putStrLn ""
+          putStrLn "Searching for tilings..."
           let pa = sum (map S.size ps)
           let ga = w * h
           case compare pa ga of
-            EQ  -> do putStrLn "Searching for tilings..."
-                      case tilings w h ps of
-                        []    ->    putStrLn "Exhaustive search completed. No tilings found!"
-                        (t:_) -> do putStrLn ""
-                                    (if c then drawTilingColour else drawTiling) (if u then ('\x25a0','\x25a1') else ('o','-')) w h t
-                                    putStrLn ""
+            EQ  -> do (if t >= 0
+                         then animate draw (t * 1000) w h ps
+                         else pure (tiling w h ps)) >>= maybe (putStrLn "Exhaustive search completed. No tilings found!") draw
+                      when (t >= 0) (putStr "\ESC[J")
             cmp -> do putStrLn ("Too " ++ (if cmp == GT then "many" else "few") ++ " polyominoes to tile!")
                       putStrLn ("  Grid area:      " ++ show ga)
                       putStrLn ("  Polyomino area: " ++ show pa)
                       exitFailure
 
-parseArgs :: [String] -> IO (Bool, Bool, Int, Int, [Poly])
-parseArgs ("-c":as) = (\(_, u, w, h, ps) -> (True, u,    w, h, ps)) <$> parseArgs as
-parseArgs ("-u":as) = (\(c, _, w, h, ps) -> (c,    True, w, h, ps)) <$> parseArgs as
-parseArgs ( w:h:as) = if all isDigit (w ++ h) && not (null as)
-                        then case mapM (`M.lookup` polyominoes) as of
-                               Nothing -> usageFail
-                               Just ps -> pure (False, False, read w, read h, ps)
-                        else usageFail
-parseArgs _         = usageFail
+animate :: ([Poly] -> IO ()) -> Int -> Int -> Int -> [Poly] -> IO (Maybe [Poly])
+animate draw t w h = go . uniquePermTree w h
+  where
+    go :: Tree [Poly] -> IO (Maybe [Poly])
+    go (Node ps ts) = do draw ps
+                         threadDelay t
+                         putStr ("\ESC[" ++ show (h+2) ++ "A")
+                         case ts of
+                           []     -> pure (if sum (map S.size ps) == w * h
+                                             then Just ps
+                                             else Nothing)
+                           (x:xs) -> do y <- go x
+                                        case y of
+                                          Nothing -> go (Node ps xs)
+                                          z       -> pure z
+
+parseArgs :: [String] -> IO (Bool, Bool, Int, Int, Int, [Poly])
+parseArgs ("-a":t:as) | all isDigit t = (\(_, u, _, w, h, ps) -> (True, u, read t, w, h, ps)) <$> parseArgs as
+parseArgs ("-c":as)   =                 (\(_, u, t, w, h, ps) -> (True, u,      t, w, h, ps)) <$> parseArgs as
+parseArgs ("-u":as)   =                 (\(c, _, t, w, h, ps) -> (c,    True,   t, w, h, ps)) <$> parseArgs as
+parseArgs (w:h:as)    = if all isDigit (w ++ h) && not (null as)
+                           then case mapM (`M.lookup` polyominoes) as of
+                                  Nothing -> usageFail
+                                  Just ps -> pure (False, False, -1, read w, read h, ps)
+                           else usageFail
+parseArgs _           = usageFail
 
 usageFail :: IO a
 usageFail = do putStr "Usage: "
                getProgName >>= putStr
-               putStrLn  " [-c] [-u] <width> <height> <polyominoes...>"
-               putStrLn  "  Set -c to output ANSI colour codes."
+               putStrLn  " [-a MILLISECONDS] [-c] [-u] <width> <height> <polyominoes...>"
+               putStrLn  "  Set -a to animate, specifying the number of milliseconds between frames."
+               putStrLn  "  Set -c to output coloured characters. This is implied by -a."
                putStrLn  "  Set -u to output Unicode characters."
+               putStrLn  "  Options -a and -c require an ANSI-compliant terminal."
                putStrLn ("  Available polyominoes: " ++ unwords (M.keys polyominoes))
                exitFailure
 
@@ -126,26 +151,32 @@ drawTiling (a,b) w h = sequence_ . intersperse (putStrLn "") . map drawPoly
     drawPoly p = putStr (unlines [((' ':) . unwords) [if (x,y) `elem` p then [a] else [b] | x <- [0..w-1]] | y <- [0..h-1]])
 
 drawTilingColour :: (Char, Char) -> Int -> Int -> [Poly] -> IO ()
-drawTilingColour (a,b) w h t = putStr (unlines [((' ':) . unwords) [colourChar (M.lookup (x,y) colourMap) | x <- [0..w-1]] | y <- [0..h-1]])
+drawTilingColour (a,b) w h t = putChar ' ' >> write (-1) [[fromMaybe 0 (M.lookup (x,y) colourMap) | x <- [0..w-1]] | y <- [0..h-1]]
   where
     colourMap :: Map (Int, Int) Int
-    colourMap = (M.unions . zipWith (\n -> M.fromSet (const n) . S.unions) [1..]) (colouring t)
+    colourMap = (M.unions . zipWith (\n -> M.fromSet (const n) . S.unions) [1..]) colouring
 
-    colourChar :: Maybe Int -> String
-    colourChar Nothing  = "\ESC[1;37m" ++ b : "\ESC[0m"
-    colourChar (Just 1) = "\ESC[1;31m" ++ a : "\ESC[0m"
-    colourChar (Just 2) = "\ESC[1;32m" ++ a : "\ESC[0m"
-    colourChar (Just 3) = "\ESC[1;36m" ++ a : "\ESC[0m"
-    colourChar (Just 4) = "\ESC[1;33m" ++ a : "\ESC[0m"
-    colourChar (Just 5) = "\ESC[1;35m" ++ a : "\ESC[0m"
-    colourChar _        = error "exhausted colours!"
+    colouring :: [[Poly]]
+    colouring = (map (map snd) . groupBy ((==) `on` fst) . sort)  (foldl step [] t)
+      where
+        step :: [(Int,Poly)] -> Poly -> [(Int,Poly)]
+        step xs p = ((\n -> (n,p) : xs) . head . flip dropWhile [1..] . flip elem . map fst) (filter (adjacent p . snd) xs)
 
-{-
-    Find a colouring such that no two adjacent polyominoes share the same colour.
--}
+    write :: Int -> [[Int]] -> IO ()
+    write _  []          =    putStr "\ESC[m"
+    write m ([]:xss)     = do putStrLn " "
+                              unless (null xss) (putChar ' ')
+                              write m xss
+    write m ((x:xs):xss) = do when (x /= m) (putStr (colourCode x))
+                              putChar (if x == 0 then b else a)
+                              unless (null xs) (putChar ' ')
+                              write x (xs:xss)
 
-colouring :: [Poly] -> [[Poly]]
-colouring = map (map snd) . groupBy ((==) `on` fst) . sort . foldl step []
-  where
-    step :: [(Int,Poly)] -> Poly -> [(Int,Poly)]
-    step xs p = ((\n -> (n,p) : xs) . head . flip dropWhile [1..] . flip elem . map fst) (filter (adjacent p . snd) xs)
+    colourCode :: Int -> String
+    colourCode 0 = "\ESC[1;37m"
+    colourCode 1 = "\ESC[1;31m"
+    colourCode 2 = "\ESC[1;32m"
+    colourCode 3 = "\ESC[1;36m"
+    colourCode 4 = "\ESC[1;33m"
+    colourCode 5 = "\ESC[1;35m"
+    colourCode _ = error "exhausted colours!"
