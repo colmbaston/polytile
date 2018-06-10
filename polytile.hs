@@ -17,6 +17,15 @@ import           System.Exit
 type Poly = Set (Int, Int)
 type Grid = Set (Int, Int)
 
+polyominoes :: Map String Poly
+polyominoes = M.fromList [("I", S.fromList [(0, 0),(0, 1),(0,2),(0,3)]),
+                          ("J", S.fromList [(1,-2),(1,-1),(0,0),(1,0)]),
+                          ("L", S.fromList [(0, 0),(0, 1),(0,2),(1,2)]),
+                          ("O", S.fromList [(0, 0),(1, 0),(0,1),(1,1)]),
+                          ("S", S.fromList [(1,-1),(2,-1),(0,0),(1,0)]),
+                          ("T", S.fromList [(0, 0),(1, 0),(2,0),(1,1)]),
+                          ("Z", S.fromList [(0, 0),(1, 0),(1,1),(2,1)])]
+
 offset :: (Int, Int) -> Poly -> Poly
 offset (x,y) = S.mapMonotonic (bimap (+x) (+y))
 
@@ -31,6 +40,12 @@ adjacent p = not . S.disjoint (S.foldl (\s -> S.union s . S.fromAscList . ortho)
 
 ortho :: (Int, Int) -> [(Int, Int)]
 ortho (x,y) = [(x-1,y),(x,y-1),(x,y+1),(x+1,y)]
+
+place :: Poly -> Grid -> Maybe Grid
+place p g | S.size g - S.size p == S.size g' = Just g'
+          | otherwise                        = Nothing
+          where
+            g' = g S.\\ p
 
 {-
     Core algorithm to find grid tilings.
@@ -56,15 +71,10 @@ tilings w h = concatMap (go grid) . uniquePerms
 
     go :: Grid -> [Poly] -> [[Poly]]
     go _ []     = [[]]
-    go g (p:ps) | sg < sp   = []
-                | otherwise = do r <- offset (minimum g) <$> rotations p
-                                 let g' = g S.\\ r
-                                 if S.size g' + sp /= sg
-                                   then []
-                                   else (r:) <$> go g' ps
-                where
-                  sg = S.size g
-                  sp = S.size p
+    go g (p:ps) = do r <- offset (minimum g) <$> rotations p
+                     case place r g of
+                       Nothing -> []
+                       Just g' -> (r:) <$> go g' ps
 
 {-
     Command-line parsing, data structure setup and core IO.
@@ -72,14 +82,19 @@ tilings w h = concatMap (go grid) . uniquePerms
 
 main :: IO ()
 main = do (c, u, w, h, ps) <- getArgs >>= parseArgs
-          case compare (sum (map S.size ps)) (w * h) of
-            GT -> putStrLn "Too many polyominoes to tile!" >> exitFailure
-            _  -> do putStrLn "Searching for tilings..."
-                     case tilings w h ps of
-                       []    ->    putStrLn "No tilings found!"
-                       (t:_) -> do putStrLn ""
-                                   (if c then drawTilingColour else drawTiling) (if u then ('\x25a0','\x25a1') else ('o','-')) w h t
-                                   putStrLn ""
+          let pa = sum (map S.size ps)
+          let ga = w * h
+          case compare pa ga of
+            EQ  -> do putStrLn "Searching for tilings..."
+                      case tilings w h ps of
+                        []    ->    putStrLn "Exhaustive search completed. No tilings found!"
+                        (t:_) -> do putStrLn ""
+                                    (if c then drawTilingColour else drawTiling) (if u then ('\x25a0','\x25a1') else ('o','-')) w h t
+                                    putStrLn ""
+            cmp -> do putStrLn ("Too " ++ (if cmp == GT then "many" else "few") ++ " polyominoes to tile!")
+                      putStrLn ("  Grid area:      " ++ show ga)
+                      putStrLn ("  Polyomino area: " ++ show pa)
+                      exitFailure
 
 parseArgs :: [String] -> IO (Bool, Bool, Int, Int, [Poly])
 parseArgs ("-c":as) = (\(_, u, w, h, ps) -> (True, u,    w, h, ps)) <$> parseArgs as
@@ -99,15 +114,6 @@ usageFail = do putStr "Usage: "
                putStrLn  "  Set -u to output Unicode characters."
                putStrLn ("  Available polyominoes: " ++ unwords (M.keys polyominoes))
                exitFailure
-
-polyominoes :: Map String Poly
-polyominoes = M.fromAscList [("I", S.fromList [(0, 0),(0, 1),(0,2),(0,3)]),
-                             ("J", S.fromList [(1,-2),(1,-1),(0,0),(1,0)]),
-                             ("L", S.fromList [(0, 0),(0, 1),(0,2),(1,2)]),
-                             ("O", S.fromList [(0, 0),(1, 0),(0,1),(1,1)]),
-                             ("S", S.fromList [(1,-1),(2,-1),(0,0),(1,0)]),
-                             ("T", S.fromList [(0, 0),(1, 0),(2,0),(1,1)]),
-                             ("Z", S.fromList [(0, 0),(1, 0),(1,1),(2,1)])]
 
 {-
     Draw tiled grids to the terminal, making sure to handle colour and Unicode options.

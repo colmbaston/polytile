@@ -157,7 +157,8 @@ Searching for tilings...
 
 ## Notes
 
-Generated colourings will not always be minimal.
+* Generated colourings will not always be minimal:
+
 [The four-colour theorem](https://en.wikipedia.org/wiki/Four_color_theorem) ensures that there will always be a four-colouring for any tiling, and while there do exist polynomial-time algorithms to find such colourings, these are complex, requiring the checking of hundreds of cases.
 The colouring algorithm implemented here is both simple and efficient, but may sometimes admit colourings that use more colours than are necessary:
 
