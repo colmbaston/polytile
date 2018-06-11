@@ -132,7 +132,7 @@ parseArgs _           = usageFail
 usageFail :: IO a
 usageFail = do putStr "Usage: "
                getProgName >>= putStr
-               putStrLn  " [-a MILLISECONDS] [-c] [-u] <width> <height> <polyominoes...>"
+               putStrLn  " [-a milliseconds] [-c] [-u] <width> <height> <polyominoes...>"
                putStrLn  "  Set -a to animate, specifying the number of milliseconds between frames."
                putStrLn  "  Set -c to output coloured characters. This is implied by -a."
                putStrLn  "  Set -u to output Unicode characters."

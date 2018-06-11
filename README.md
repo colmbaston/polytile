@@ -10,7 +10,7 @@ I've included a Bash script, `talos.sh`, that will run `polytile` on all 35 sigi
 ## Usage
 
 ```
-./polytile [-a MILLISECONDS] [-c] [-u] <width> <height> <polyominoes...>
+./polytile [-a milliseconds] [-c] [-u] <width> <height> <polyominoes...>
 ```
 
 For best results, if your terminal will allow it, set the `-c` option to output ANSI colour codes, allowing the output to be condensed into a single drawing, and set the `-u` option to output Unicode characters.
