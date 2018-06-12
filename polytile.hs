@@ -179,4 +179,5 @@ drawTilingColour (a,b) w h t = putChar ' ' >> write (-1) [[fromMaybe 0 (M.lookup
     colourCode 3 = "\ESC[1;36m"
     colourCode 4 = "\ESC[1;33m"
     colourCode 5 = "\ESC[1;35m"
-    colourCode _ = error "exhausted colours!"
+    colourCode 6 = "\ESC[1;34m"
+    colourCode _ = error ("exhausted colours on tiling " ++ show t)
