@@ -17,7 +17,7 @@ For best results, if your terminal will allow it, set the `-c` option to output 
 
 ![Colour](./colour.png)
 
-The output can also be animated with the `-a` option, specifying the number of milliseconds to delay between updating the drawing. Setting `-a` implies `-c`.
+The output can also be animated with the `-a` option, specifying the number of milliseconds to delay between updates to the drawing. Setting `-a` implies `-c`.
 
 ![Animation](./animation.gif)
 
