@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "Demo:"
+./polytile -c -u 4 5 L S T T Z
+./polytile -c -u 7 4 I I L S T T Z
+
 echo "Hub Gates (Green):"
 ./polytile -c -u 4 3 J J Z
 ./polytile -c -u 4 4 I J L Z

@@ -5,7 +5,7 @@ The program is capable of handling any polyomino, simply representing them as se
 
 
 I originally wrote this because I was too lazy to actually solve the sigil puzzles in the (otherwise incredible) [Talos Principle](http://www.croteam.com/talosprinciple/), but not lazy enough to just look up a guide.
-I've included a Bash script, `talos.sh`, that will run `polytile` on all 35 sigil puzzles from game.
+I've included a Bash script, `talos.sh`, that will run `polytile` on all sigil puzzles from the game.
 
 ## Usage
 
