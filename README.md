@@ -3,8 +3,7 @@
 A Haskell program for tiling one-sided [polyominoes](https://en.wikipedia.org/wiki/Polyomino) on a rectangular grid.
 The program is capable of handling any polyomino, simply representing them as sets of coordinates internally, but currently only accepts the seven one-sided tetrominos (polyominos of size four) from the command-line.
 
-
-I originally wrote this because I was too lazy to actually solve the sigil puzzles in the (otherwise incredible) [Talos Principle](http://www.croteam.com/talosprinciple/), but not lazy enough to just look up a guide.
+I originally wrote this because I thought that writing it would be a more interesting puzzle than the sigil tiling puzzles in [The Talos Principle](http://www.croteam.com/talosprinciple/).
 I've included a Bash script, `talos.sh`, that will run `polytile` on all sigil puzzles from the game.
 
 ## Usage
