@@ -97,3 +97,6 @@ The output can also be animated with the `-a` option, specifying the number of m
 The colouring algorithm implemented here is both simple and efficient, but may sometimes admit colourings that use more colours than are necessary:
 
 ![Five Colours](./five-colours.png)
+
+The maximum number of colours that I've observed the algorithm to use is currently six.
+Please let me know if you find an example where the algorithm needs more than this.
