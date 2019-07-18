@@ -16,9 +16,21 @@ For best results, if your terminal will allow it, set the `-c` option to output 
 
 ![Colour](./colour.png)
 
-The output can also be animated with the `-a` option, specifying the number of milliseconds to delay between updates to the drawing. Setting `-a` implies `-c`.
+The search can also be animated with the `-a` option, specifying the number of milliseconds to delay between each update to the drawing.
+Setting `-a` implies `-c`.
 
 ![Animation](./animation.gif)
+
+## Algorithm
+
+The tiling algorithm is brute-force, generating all unique rotations and permutations of the given polyominoes.
+For each permutation, the polyominoes are traversed in order, attempting to place each in the leftmost-uppermost available space; if one doesn't fit, either because it falls outside the grid's boundary or it overlaps with an already placed polyomino, try again with the next permutation.
+
+A naive implementation of the algorithm just described would be intolerably slow, however.
+The algorithm is optimised by generating the permutations as a [rose tree](https://en.wikipedia.org/wiki/Rose_tree) of partial-tilings which is [lazily](https://en.wikipedia.org/wiki/Lazy_evaluation) consumed.
+The root of the tree represents an empty grid, no polyominoes having been placed, and each child node has one more polyomino successfully placed than its parent.
+When a polyomino doesn't fit, rather than starting the next permutation from the empty grid, we can backtrack, attempting to place a different polyomino into the parent node's grid.
+The animation command-line option visualises this depth-first search.
 
 ## Polyominoes
 
@@ -98,5 +110,5 @@ The colouring algorithm implemented here is both simple and efficient, but may s
 
 ![Five Colours](./five-colours.png)
 
-The maximum number of colours that I've observed the algorithm to use is currently six.
-Please let me know if you find an example where the algorithm needs more than this.
+The maximum number of colours that I've observed the colouring algorithm using is currently six.
+Please let me know if you find an example which requires more than this.
