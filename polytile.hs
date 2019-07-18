@@ -1,3 +1,5 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 import           Data.Char
 import           Data.List
 import           Data.Tree
@@ -18,17 +20,19 @@ import           Control.Concurrent
     Polyominos, grids, and coordinate-based utility functions.
 -}
 
-type Poly = Set (Int, Int)
-type Grid = Set (Int, Int)
+type Poly  = Set (Int, Int)
+type Grid  = Set (Int, Int)
+type RPoly = [Poly]
 
-polyominoes :: Map String Poly
-polyominoes = M.fromAscList [("I", S.fromList [(0, 0),(0, 1),(0,2),(0,3)]),
-                             ("J", S.fromList [(1,-2),(1,-1),(0,0),(1,0)]),
-                             ("L", S.fromList [(0, 0),(0, 1),(0,2),(1,2)]),
-                             ("O", S.fromList [(0, 0),(1, 0),(0,1),(1,1)]),
-                             ("S", S.fromList [(1,-1),(2,-1),(0,0),(1,0)]),
-                             ("T", S.fromList [(0, 0),(1, 0),(2,0),(1,1)]),
-                             ("Z", S.fromList [(0, 0),(1, 0),(1,1),(2,1)])]
+polyominoes :: Map String RPoly
+polyominoes = M.fromAscList (map (fmap (rotations . S.fromList))
+  [("I", [(0, 0),(0, 1),(0,2),(0,3)]),
+   ("J", [(1,-2),(1,-1),(0,0),(1,0)]),
+   ("L", [(0, 0),(0, 1),(0,2),(1,2)]),
+   ("O", [(0, 0),(1, 0),(0,1),(1,1)]),
+   ("S", [(1,-1),(2,-1),(0,0),(1,0)]),
+   ("T", [(0, 0),(1, 0),(2,0),(1,1)]),
+   ("Z", [(0, 0),(1, 0),(1,1),(2,1)])])
 
 offset :: (Int, Int) -> Poly -> Poly
 offset (x,y) = S.mapMonotonic (bimap (+x) (+y))
@@ -55,24 +59,24 @@ place p g | S.size g - S.size p == S.size g' = Just g'
     Core algorithm to find grid tilings.
 -}
 
-uniquePermTree :: Int -> Int -> [Poly] -> Tree [Poly]
+uniquePermTree :: Int -> Int -> [RPoly] -> Tree [Poly]
 uniquePermTree w h = go grid [] . group . sort
   where
     grid :: Grid
     grid = S.fromAscList [(x,y) | x <- [0..w-1], y <- [0..h-1]]
 
-    go :: Grid -> [Poly] -> [[Poly]] -> Tree [Poly]
+    go :: Grid -> [Poly] -> [[RPoly]] -> Tree [Poly]
     go g xs pss = Node xs (do (y:ys,yss) <- selects pss
-                              r <- offset (minimum g) <$> rotations y
+                              r <- offset (minimum g) <$> y
                               case place r g of
                                 Nothing -> []
-                                Just g' -> [go g' (xs ++ [r]) (if null ys then yss else ys:yss)])
+                                Just g' -> [go g' (r : xs) (if null ys then yss else ys:yss)])
 
 selects :: [a] -> [(a,[a])]
 selects []     = []
-selects (x:xs) = (x,xs) : map (fmap (x:)) (selects xs)
+selects (x:xs) = (x,xs) : map ((x:) <$>) (selects xs)
 
-tiling :: Int -> Int -> [Poly] -> Maybe [Poly]
+tiling :: Int -> Int -> [RPoly] -> Maybe [Poly]
 tiling w h = go . uniquePermTree w h
   where
     go :: Tree [Poly] -> Maybe [Poly]
@@ -90,7 +94,7 @@ main = do (c, u, t, w, h, ps) <- getArgs >>= parseArgs
                                         (if u then ('\x25a0','\x25a1') else ('o','-'))
                                           w h x >> putStrLn ""
           putStrLn "Searching for tilings..."
-          let pa = sum (map S.size ps)
+          let pa = sum (map (S.size . head) ps)
           let ga = w * h
           case compare pa ga of
             EQ  -> do (if t >= 0
@@ -102,7 +106,7 @@ main = do (c, u, t, w, h, ps) <- getArgs >>= parseArgs
                       putStrLn ("  Polyomino area: " ++ show pa)
                       exitFailure
 
-animate :: ([Poly] -> IO ()) -> Int -> Int -> Int -> [Poly] -> IO (Maybe [Poly])
+animate :: ([Poly] -> IO ()) -> Int -> Int -> Int -> [RPoly] -> IO (Maybe [Poly])
 animate draw t w h = go . uniquePermTree w h
   where
     go :: Tree [Poly] -> IO (Maybe [Poly])
@@ -118,7 +122,7 @@ animate draw t w h = go . uniquePermTree w h
                                           Nothing -> go (Node ps xs)
                                           z       -> pure z
 
-parseArgs :: [String] -> IO (Bool, Bool, Int, Int, Int, [Poly])
+parseArgs :: [String] -> IO (Bool, Bool, Int, Int, Int, [RPoly])
 parseArgs ("-a":t:as) | all isDigit t = (\(_, u, _, w, h, ps) -> (True, u, read t, w, h, ps)) <$> parseArgs as
 parseArgs ("-c":as)   =                 (\(_, u, t, w, h, ps) -> (True, u,      t, w, h, ps)) <$> parseArgs as
 parseArgs ("-u":as)   =                 (\(c, _, t, w, h, ps) -> (c,    True,   t, w, h, ps)) <$> parseArgs as
@@ -157,10 +161,10 @@ drawTilingColour (a,b) w h t = putChar ' ' >> write (-1) [[fromMaybe 0 (M.lookup
     colourMap = (M.unions . zipWith (\n -> M.fromSet (const n) . S.unions) [1..]) colouring
 
     colouring :: [[Poly]]
-    colouring = (map (map snd) . groupBy ((==) `on` fst) . sort)  (foldl step [] t)
+    colouring = (map (map snd) . groupBy ((==) `on` fst) . sort)  (foldr step [] t)
       where
-        step :: [(Int,Poly)] -> Poly -> [(Int,Poly)]
-        step xs p = ((\n -> (n,p) : xs) . head . flip dropWhile [1..] . flip elem . map fst) (filter (adjacent p . snd) xs)
+        step :: Poly -> [(Int,Poly)] -> [(Int,Poly)]
+        step p xs = ((\n -> (n,p) : xs) . head . flip dropWhile [1..] . flip elem . map fst) (filter (adjacent p . snd) xs)
 
     write :: Int -> [[Int]] -> IO ()
     write _  []          =    putStr "\ESC[m"
