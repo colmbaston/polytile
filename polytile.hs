@@ -41,7 +41,7 @@ normalise :: Poly -> Poly
 normalise p = offset (bimap negate negate (minimum p)) p
 
 rotations :: Poly -> [Poly]
-rotations = map head . group . sort . map normalise . take 4 . iterate (S.map (swap . fmap negate))
+rotations = S.toAscList . S.fromList . map normalise . take 4 . iterate (S.map (swap . fmap negate))
 
 adjacent :: Poly -> Poly -> Bool
 adjacent p = not . S.disjoint (S.foldl (\s -> S.union s . S.fromAscList . ortho) S.empty p S.\\ p)
