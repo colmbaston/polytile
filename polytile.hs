@@ -1,20 +1,18 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
-import           Data.Char
-import           Data.List
-import           Data.Tree
-import           Data.Maybe
-import           Data.Tuple
-import qualified Data.Set as S
-import           Data.Set (Set)
-import qualified Data.Map as M
-import           Data.Map (Map)
-import           Data.Bifunctor
-import           Data.Function
-import           System.Environment
-import           System.Exit
-import           Control.Monad
-import           Control.Concurrent
+import Data.Char
+import Data.List
+import Data.Tree
+import Data.Maybe
+import Data.Tuple
+import Data.Set qualified as S
+import Data.Set (Set)
+import Data.Map qualified as M
+import Data.Map (Map)
+import Data.Bifunctor
+import Data.Function
+import System.Environment
+import System.Exit
+import Control.Monad
+import Control.Concurrent
 
 {-
     Polyominos, grids, and coordinate-based utility functions.

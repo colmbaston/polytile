@@ -1,4 +1,4 @@
-cabal-version:       >= 2.0
+cabal-version:       2.0
 
 name:                polytile
 version:             0.1.0.0
@@ -10,7 +10,7 @@ extra-source-files:  README.md
 
 executable polytile
   main-is:           polytile.hs
-  default-language:  Haskell2010
+  default-language:  GHC2021
   ghc-options:       -Wall
-  build-depends:     base       ^>= 4.14,
+  build-depends:     base       ^>= 4.16,
                      containers ^>= 0.6

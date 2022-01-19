@@ -46,16 +46,16 @@ echo "Messenger C (Blue):"
 ./$EXE -c -u 4 5 L S T T Z
 ./$EXE -c -u 7 4 I J L T T Z Z
 ./$EXE -c -u 6 6 I J J L L O O Z Z
-./$EXE -c -u 8 6  I J J J L L O O T T Z Z
+./$EXE -c -u 8 6 I J J J L L O O T T Z Z
 
 echo "Bonus Gates (Stars):"
-./$EXE -c -u 8 5  J L S S T T T T Z Z
-./$EXE -c -u 8 5  I I J L L O T T T T
-./$EXE -c -u 8 5  I I J L O O S T T Z
+./$EXE -c -u 8 5 J L S S T T T T Z Z
+./$EXE -c -u 8 5 I I J L L O T T T T
+./$EXE -c -u 8 5 I I J L O O S T T Z
 
 echo "Messenger Ending (Grey):"
-./$EXE -c -u 6 6  L L L L O S S S S
+./$EXE -c -u 6 6 L L L L O S S S S
 
 echo "Road to Gehenna:"
-./$EXE -c -u 7 4  I J J L L T T
-./$EXE -c -u 5 8  I I L S S S T T T T
+./$EXE -c -u 7 4 I J J L L T T
+./$EXE -c -u 5 8 I I L S S S T T T T
