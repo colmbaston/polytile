@@ -5,7 +5,7 @@ The program is capable of handling any polyomino, simply representing them as se
 
 I originally wrote this to solve the sigil tiling puzzles in [The Talos Principle](http://www.croteam.com/talosprinciple/).
 I've included a Bash script, `talos.sh`, that will run `polytile` on all sigil puzzles from the game.
-The script just needs to be pointed to the location of the executable through its `EXE` varible; by default, this can be passed as the first command-line argument.
+The script just needs to be pointed to the location of the executable through its `exe` varible; by default, this can be passed as the first command-line argument.
 
 ## Usage
 
